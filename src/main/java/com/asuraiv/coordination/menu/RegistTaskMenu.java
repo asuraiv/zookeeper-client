@@ -24,6 +24,8 @@ import com.asuraiv.coordination.enums.TaskStatus;
  */
 public class RegistTaskMenu implements Menu, Watcher {
 	
+	private Menu nextMenu;
+	
 	@Override
 	public void displayMenu() {
 		
@@ -43,7 +45,7 @@ public class RegistTaskMenu implements Menu, Watcher {
 			switch(scanner.next()) {
 				case "N":
 				case "n":
-					new MainMenu().displayMenu();
+					nextMenu = new MainMenu();
 					isContinue = false;
 					break;
 				case "Y":
@@ -58,6 +60,8 @@ public class RegistTaskMenu implements Menu, Watcher {
 					break;
 			}
 		}
+		
+		nextMenu.displayMenu();
 	}
 
 	/**

@@ -8,6 +8,7 @@
 package com.asuraiv.coordination;
 
 import com.asuraiv.coordination.menu.MainMenu;
+import com.asuraiv.coordination.menu.Menu;
 
 /**
  * @author Jupyo Hong
@@ -17,7 +18,7 @@ public class Client {
 	public static void main(String[] args) {
 		
 		// application start
-		MainMenu mainMenu = new MainMenu();
+		Menu mainMenu = new MainMenu();
 		mainMenu.displayMenu();
 	}
 }

@@ -22,6 +22,8 @@ import org.springframework.util.CollectionUtils;
  */
 public class MainMenu implements Menu, Watcher {
 	
+	private Menu nextMenu;
+	
 	@Override
 	public void displayMenu() {
 		
@@ -44,17 +46,15 @@ public class MainMenu implements Menu, Watcher {
 			
 			switch(scanner.next()) {
 				case "1":
-					new RegistTaskMenu().displayMenu();
+					nextMenu = new RegistTaskMenu();
 					isContinue = false;
 					break;
 				case "2":
-					new ListTaskMenu().displayMenu();
-					// 현황만 보여주고 계속 메인메뉴를 보여준다.
+					doTaskListUp();
 					isContinue = true;
 					break;
 				case "3":
 					doDeleteTasks();
-					// 현황만 보여주고 계속 메인메뉴를 보여준다.
 					isContinue = true;
 					break;
 				case "99":
@@ -67,10 +67,12 @@ public class MainMenu implements Menu, Watcher {
 					break;
 			}
 		}
+		
+		nextMenu.displayMenu();
 	}
 
 	/**
-	 * 
+	 * 작업들을 모두 초기화(삭제)한다.
 	 */
 	private void doDeleteTasks() {
 		try {
@@ -90,6 +92,39 @@ public class MainMenu implements Menu, Watcher {
 			for(String task : tasks) {
 				zk.delete("/tasks/" + task, -1);
 				System.out.println(task + "가 삭제되었습니다 ");
+			}
+			
+			zk.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (KeeperException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 현재 작업현황을 보여준다.
+	 */
+	private void doTaskListUp() {
+		try {
+			
+			ZooKeeper zk = new ZooKeeper("10.113.182.195:2181", 15000, this);
+			
+			System.out.println();
+			System.out.println("### 작업 현황 ###");
+			
+			List<String> tasks = zk.getChildren("/tasks", false, null);
+			
+			if(CollectionUtils.isEmpty(tasks)) {
+				System.out.println("[WARNNING] 현재 등록된 작업이 없습니다.");
+			}
+			
+			for(String task : tasks) {
+				String status = new String(zk.getData("/tasks/" + task, false, null));
+				System.out.println(task + ": " + status);
 			}
 			
 			zk.close();
